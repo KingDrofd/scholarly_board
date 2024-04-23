@@ -1,12 +1,28 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:scholarly_board/components/provider/page_provider.dart';
+import 'package:scholarly_board/pages/accountPage/account_page.dart';
+import 'package:scholarly_board/pages/chartPages/bar_chart_page.dart';
+import 'package:scholarly_board/pages/chartPages/line_chart_page.dart';
+import 'package:scholarly_board/pages/chartPages/pie_chart_page.dart';
+import 'package:scholarly_board/pages/chartPages/radar_chart_page.dart';
+import 'package:scholarly_board/pages/chartPages/scatter_chart_page.dart';
+import 'package:scholarly_board/pages/chartPages/table_chart_page.dart';
+import 'package:scholarly_board/pages/dashboard/dashboard_page.dart';
+import 'package:scholarly_board/pages/homePage/home_page.dart';
+import 'package:scholarly_board/pages/settingsPage/settings_page.dart';
 
+import 'components/SideBar/side_bar.dart';
 import 'widgets/custom_side_button.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => PageProvider(), child: const MyApp()));
   doWhenWindowReady(() {
     const initialSize = Size(1280, 780);
     appWindow.minSize = initialSize;
@@ -46,25 +62,7 @@ class MainPage extends StatelessWidget {
         child: Row(
           children: [
             const SideBar(),
-            Expanded(
-                child: Column(
-              children: [
-                WindowTitleBarBox(
-                  child: Row(
-                    children: [
-                      Expanded(child: MoveWindow()),
-                      Row(
-                        children: [
-                          MinimizeWindowButton(),
-                          MaximizeWindowButton(),
-                          CloseWindowButton()
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ))
+            ShowcasePage(),
           ],
         ),
       ),
@@ -72,105 +70,55 @@ class MainPage extends StatelessWidget {
   }
 }
 
-class SideBar extends StatelessWidget {
-  const SideBar({
+class ShowcasePage extends StatelessWidget {
+  const ShowcasePage({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 64,
-      height: double.maxFinite,
-      decoration: const BoxDecoration(color: Colors.grey),
+    return Expanded(
       child: Column(
         children: [
           WindowTitleBarBox(
-            child: MoveWindow(),
-          ),
-          Expanded(
-            child: Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SideButtonGhost(),
-                  const Gap(15),
-                  Container(
-                    width: 50,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[400],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  const Gap(30),
-                  const Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SideBarButton(),
-                      const Gap(20),
-                      SideButtonGhost(),
-                      const Gap(20),
-                      SideButtonGhost(),
-                      const Gap(20),
-                      SideButtonGhost(),
-                      const Gap(20),
-                      SideButtonGhost(),
-                      const Gap(20),
-                      SideButtonGhost(),
-                      const Gap(20),
-                      SideButtonGhost(),
-                      const Gap(20),
-                      SideButtonGhost(),
-                    ],
-                  ),
-                  Gap(40),
-                  Container(
-                    width: 50,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[400],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  const Gap(20),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[400],
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        const Gap(20),
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[400],
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        const Gap(20),
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[400],
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Gap(20)
-                ],
-              ),
+            child: Row(
+              children: [
+                Expanded(child: MoveWindow()),
+                Row(
+                  children: [
+                    MinimizeWindowButton(),
+                    MaximizeWindowButton(),
+                    CloseWindowButton()
+                  ],
+                )
+              ],
             ),
+          ),
+          Consumer<PageProvider>(
+            builder: (context, pageProvider, _) {
+              switch (pageProvider.currentPage) {
+                case Pages.HomePage:
+                  return HomePage();
+                case Pages.DashboardPage:
+                  return DashboardPage();
+                case Pages.SettingsPage:
+                  return SettingsPage();
+                case Pages.LineChartPage:
+                  return LineChartPage();
+                case Pages.BarChartPage:
+                  return BarChartPage();
+                case Pages.PieChartPage:
+                  return PieChartPage();
+                case Pages.ScatterChartPage:
+                  return ScatterChartPage();
+                case Pages.RadarChartPage:
+                  return RadarChartPage();
+                case Pages.TableChartPage:
+                  return TableChartPage();
+                case Pages.AccountPage:
+                  return AccountPage();
+              }
+            },
           ),
         ],
       ),
