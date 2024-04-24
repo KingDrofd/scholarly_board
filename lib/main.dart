@@ -2,6 +2,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,6 @@ import 'package:scholarly_board/pages/homePage/home_page.dart';
 import 'package:scholarly_board/pages/settingsPage/settings_page.dart';
 
 import 'components/SideBar/side_bar.dart';
-import 'widgets/custom_side_button.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
@@ -58,7 +58,6 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.grey[400],
         child: Row(
           children: [
             const SideBar(),
@@ -78,7 +77,7 @@ class ShowcasePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Column(
+      child: Stack(
         children: [
           WindowTitleBarBox(
             child: Row(

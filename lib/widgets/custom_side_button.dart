@@ -5,9 +5,14 @@ import 'package:flutter/services.dart';
 class SideBarButton extends StatefulWidget {
   final IconData icon;
   final Function()? onTap;
+  final bool isFocused;
+  final int index;
+
   const SideBarButton({
+    required this.index,
     this.icon = Icons.home_rounded,
     this.onTap,
+    this.isFocused = false,
     super.key,
   });
 
@@ -24,37 +29,48 @@ class _SideBarButtonState extends State<SideBarButton> {
       cursor: SystemMouseCursors.click,
       onEnter: (event) {
         setState(() {
-          _isHover = !_isHover;
+          _isHover = true;
         });
       },
       onExit: (event) {
         setState(() {
-          _isHover = !_isHover;
+          _isHover = false;
         });
       },
       child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: Duration(milliseconds: 100),
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: _isHover ? Colors.deepPurpleAccent : Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: _isHover
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ]
-                : [], // No shadow when _isShadowVisible is false
-          ),
-          child: Icon(
-            widget.icon,
-            color: _isHover ? Colors.white : Colors.black,
+        onTap: () {
+          widget.onTap?.call();
+        },
+        child: Focus(
+          onFocusChange: (isFocused) {
+            setState(() {
+              _isHover = isFocused;
+            });
+          },
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 100),
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: _isHover || widget.isFocused
+                  ? Colors.deepPurpleAccent
+                  : Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: (_isHover || widget.isFocused)
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ]
+                  : [], // No shadow when _isShadowVisible is false
+            ),
+            child: Icon(
+              widget.icon,
+              color: _isHover || widget.isFocused ? Colors.white : Colors.black,
+            ),
           ),
         ),
       ),
