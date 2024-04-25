@@ -79,20 +79,6 @@ class ShowcasePage extends StatelessWidget {
     return Expanded(
       child: Stack(
         children: [
-          WindowTitleBarBox(
-            child: Row(
-              children: [
-                Expanded(child: MoveWindow()),
-                Row(
-                  children: [
-                    MinimizeWindowButton(),
-                    MaximizeWindowButton(),
-                    CloseWindowButton()
-                  ],
-                )
-              ],
-            ),
-          ),
           Consumer<PageProvider>(
             builder: (context, pageProvider, _) {
               switch (pageProvider.currentPage) {
@@ -118,6 +104,20 @@ class ShowcasePage extends StatelessWidget {
                   return AccountPage();
               }
             },
+          ),
+          WindowTitleBarBox(
+            child: Row(
+              children: [
+                Expanded(child: MoveWindow()),
+                Row(
+                  children: [
+                    MinimizeWindowButton(),
+                    MaximizeWindowButton(),
+                    CloseWindowButton()
+                  ],
+                )
+              ],
+            ),
           ),
         ],
       ),
