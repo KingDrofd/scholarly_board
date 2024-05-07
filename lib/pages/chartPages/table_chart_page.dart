@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:scholarly_board/models/student_model.dart';
 import 'package:scholarly_board/utils/variables_dev.dart';
 
 class TableChartPage extends StatefulWidget {
@@ -14,22 +16,26 @@ class TableChartPage extends StatefulWidget {
 }
 
 class _TableChartPageState extends State<TableChartPage> {
-  List<dynamic> data = []; // Define the data variable
-  bool _ascending = true;
-  int _sortColumnIndex = 0;
+  Future<String> _loadJsonFile() async {
+    return await File(sampleJSON).readAsString();
+  }
+
+  Future _parseJson() async {
+    String jsonString = await _loadJsonFile();
+    List data = jsonDecode(jsonString);
+
+    List students = data.map((json) {
+      return Student.fromJson(json);
+    }).toList();
+
+    return students;
+  }
 
   @override
   void initState() {
+    _loadJsonFile();
+    _parseJson();
     super.initState();
-    loadData();
-  }
-
-  Future<void> loadData() async {
-    String jsonData =
-        await DefaultAssetBundle.of(context).loadString('$sampleJSON');
-    setState(() {
-      data = json.decode(jsonData);
-    });
   }
 
   @override
@@ -39,66 +45,80 @@ class _TableChartPageState extends State<TableChartPage> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: data.isEmpty
-              ? Center(child: CircularProgressIndicator())
-              : Transform.translate(
-                  offset: Offset(0, 50),
-                  child: DataTable(
-                    sortAscending: _ascending,
-                    sortColumnIndex: 0, // Default sorting by the first column
-                    columns: _buildColumns(data.first.keys.toList()),
-                    rows: _buildRows(data.first.keys.toList()),
-                  ),
-                ),
+          child: FutureBuilder(
+            future: Future.delayed(Duration(seconds: 1), () => _parseJson()),
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const LinearProgressIndicator();
+              } else if (snapshot.hasError) {
+                return SelectableText("Error: ${snapshot.error}");
+              } else {
+                return StudentsDataTable(students: snapshot.data!);
+              }
+            },
+          ),
         ),
       ),
     );
   }
+}
 
-  List<DataColumn> _buildColumns(List<String> keys) {
-    return keys
-        .asMap()
-        .entries
-        .map(
-          (entry) => DataColumn(
-            label: Text(entry.value),
-            onSort: (columnIndex, ascending) {
-              setState(() {
-                _sort(entry.key, ascending);
-              });
-            },
-          ),
-        )
-        .toList();
+class StudentList extends StatelessWidget {
+  final List students;
+
+  const StudentList({super.key, required this.students});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: students.length,
+      itemBuilder: (context, index) {
+        final student = students[index];
+        print('Student: ${student.name}');
+        return ListTile(
+          title: Text(student.name),
+        );
+      },
+    );
   }
+}
 
-  List<DataRow> _buildRows(List<String> keys) {
-    return data.map((item) {
-      return DataRow(
-        cells: keys.map((key) => DataCell(Text(item[key].toString()))).toList(),
-      );
-    }).toList();
-  }
+class StudentsDataTable extends StatelessWidget {
+  final List students;
 
-  void _sort(int columnIndex, bool ascending) {
-    setState(() {
-      _sortColumnIndex = columnIndex;
-      _ascending = ascending;
+  const StudentsDataTable({super.key, required this.students});
 
-      data.sort((a, b) {
-        final aValue = a.values.toList()[columnIndex];
-        final bValue = b.values.toList()[columnIndex];
-        if (aValue is Comparable && bValue is Comparable) {
-          return ascending
-              ? Comparable.compare(aValue, bValue)
-              : Comparable.compare(bValue, aValue);
-        } else {
-          return 0;
-        }
-      });
-
-      // Toggle the sorting order for next time
-      _ascending = !_ascending;
-    });
+  @override
+  Widget build(BuildContext context) {
+    return DataTable(
+      columns: [
+        DataColumn(label: Text('Name')),
+        DataColumn(label: Text('Age')),
+        DataColumn(label: Text('Gender')),
+        DataColumn(label: Text('Race/Ethnicity')),
+        DataColumn(label: Text('Parental Level of Education')),
+        DataColumn(label: Text('Lunch')),
+        DataColumn(label: Text('Test Preparation Course')),
+        DataColumn(label: Text('Math Score')),
+        DataColumn(label: Text('Reading Score')),
+        DataColumn(label: Text('Physics Score')),
+        DataColumn(label: Text('Writing Score')),
+      ],
+      rows: students.map((student) {
+        return DataRow(cells: [
+          DataCell(Text(student.name)),
+          DataCell(Text(student.age.toString())),
+          DataCell(Text(student.gender)),
+          DataCell(Text(student.raceEthnicity)),
+          DataCell(Text(student.parentalLevelOfEducation)),
+          DataCell(Text(student.lunch)),
+          DataCell(Text(student.testPreparationCourse)),
+          DataCell(Text(student.mathScore.toString())),
+          DataCell(Text(student.readingScore.toString())),
+          DataCell(Text(student.physicsScore.toString())),
+          DataCell(Text(student.writingScore.toString())),
+        ]);
+      }).toList(),
+    );
   }
 }
