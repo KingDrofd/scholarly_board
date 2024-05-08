@@ -56,14 +56,12 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: Row(
-          children: [
-            const SideBar(),
-            ShowcasePage(),
-          ],
-        ),
+    return const Scaffold(
+      body: Row(
+        children: [
+          SideBar(),
+          ShowcasePage(),
+        ],
       ),
     );
   }
@@ -79,31 +77,36 @@ class ShowcasePage extends StatelessWidget {
     return Expanded(
       child: Stack(
         children: [
-          Consumer<PageProvider>(
-            builder: (context, pageProvider, _) {
-              switch (pageProvider.currentPage) {
-                case Pages.HomePage:
-                  return HomePage();
-                case Pages.DashboardPage:
-                  return DashboardPage();
-                case Pages.SettingsPage:
-                  return SettingsPage();
-                case Pages.LineChartPage:
-                  return LineChartPage();
-                case Pages.BarChartPage:
-                  return BarChartPage();
-                case Pages.PieChartPage:
-                  return PieChartPage();
-                case Pages.ScatterChartPage:
-                  return ScatterChartPage();
-                case Pages.RadarChartPage:
-                  return RadarChartPage();
-                case Pages.TableChartPage:
-                  return TableChartPage();
-                case Pages.AccountPage:
-                  return AccountPage();
-              }
-            },
+          Container(
+            padding: EdgeInsets.only(top: 20),
+            width: double.maxFinite,
+            height: double.maxFinite,
+            child: Consumer<PageProvider>(
+              builder: (context, pageProvider, _) {
+                switch (pageProvider.currentPage) {
+                  case Pages.HomePage:
+                    return HomePage();
+                  case Pages.DashboardPage:
+                    return DashboardPage();
+                  case Pages.SettingsPage:
+                    return SettingsPage();
+                  case Pages.LineChartPage:
+                    return LineChartPage();
+                  case Pages.BarChartPage:
+                    return BarChartPage();
+                  case Pages.PieChartPage:
+                    return PieChartPage();
+                  case Pages.ScatterChartPage:
+                    return ScatterChartPage();
+                  case Pages.RadarChartPage:
+                    return RadarChartPage();
+                  case Pages.TableChartPage:
+                    return TableChartPage();
+                  case Pages.AccountPage:
+                    return AccountPage();
+                }
+              },
+            ),
           ),
           WindowTitleBarBox(
             child: Row(

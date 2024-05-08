@@ -42,21 +42,21 @@ class _TableChartPageState extends State<TableChartPage> {
   Widget build(BuildContext context) {
     return Center(
       child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: FutureBuilder(
-            future: Future.delayed(Duration(seconds: 1), () => _parseJson()),
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const LinearProgressIndicator();
-              } else if (snapshot.hasError) {
-                return SelectableText("Error: ${snapshot.error}");
-              } else {
-                return StudentsDataTable(students: snapshot.data!);
-              }
-            },
-          ),
+        scrollDirection: Axis.horizontal,
+        child: FutureBuilder(
+          future: Future.delayed(Duration(seconds: 1), () => _parseJson()),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return SizedBox(
+                  width: 300, child: const LinearProgressIndicator());
+            } else if (snapshot.hasError) {
+              return SelectableText("Error: ${snapshot.error}");
+            } else {
+              return SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: StudentsDataTable(students: snapshot.data!));
+            }
+          },
         ),
       ),
     );
